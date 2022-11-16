@@ -55,6 +55,5 @@ class Playlist(models.Model):
     songs = models.ManyToManyField('Song')
     tags = models.ManyToManyField('Tag')
     
-
     def __str__(self):
         return self.title
