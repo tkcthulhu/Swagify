@@ -5,7 +5,7 @@ from django.db import models
 class Artist(models.Model):
 
     name = models.CharField(max_length=50)
-    listers = models.IntegerField()
+    listeners = models.IntegerField()
     bio = models.TextField(max_length=500)
 
     def __str__(self):
@@ -22,7 +22,7 @@ class Song(models.Model):
 
     title = models.CharField(max_length=50)
     main_artist = models.ManyToManyField('Artist')
-    feat_artist = models.ManyToManyField('Artist', related_name='Feat')
+    feat_artist = models.ManyToManyField('Artist', related_name='Feat', blank=True)
     explicit = models.BooleanField()
     length = models.DurationField()
     plays = models.IntegerField()
