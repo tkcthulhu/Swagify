@@ -54,6 +54,7 @@ class Playlist(models.Model):
     user_generated = models.BooleanField()
     songs = models.ManyToManyField('Song')
     tags = models.ManyToManyField('Tag')
+    
 
     def __str__(self):
         return self.title
