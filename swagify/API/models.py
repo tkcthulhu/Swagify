@@ -29,7 +29,7 @@ class Song(models.Model):
     genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.title
+        return f'{self.title} artist: {self.main_artist.first()}'
 
 class Album(models.Model):
 
@@ -48,11 +48,20 @@ class Tag(models.Model):
     def __str__(self):
         return self.title
 
+class PlaylistOrder(models.Model):
+    track_num = models.SmallIntegerField()
+    song = models.ForeignKey('Song', on_delete=models.PROTECT)
+    playlist = models.ForeignKey('Playlist', on_delete=models.PROTECT)
+
+    def __str__(self):
+        return f'{self.playlist} track {self.track_num}: {self.song}'
+
+
 class Playlist(models.Model):
 
     title = models.CharField(max_length=50)
     user_generated = models.BooleanField()
-    songs = models.ManyToManyField('Song')
+    songs = models.ManyToManyField(Song, through='PlaylistOrder')
     tags = models.ManyToManyField('Tag')
     
     def __str__(self):

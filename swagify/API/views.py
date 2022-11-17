@@ -40,6 +40,11 @@ class ArtistViewSet(viewsets.ModelViewSet):
     serializer_class = ArtistSerializer
     permission_classes = [permissions.AllowAny]
 
+class PlaylistViewSet(viewsets.ModelViewSet):
+    queryset = Playlist.objects.all()
+    serializer_class = PlaylistSerializer
+    permission_classes = [permissions.AllowAny]
+
 class SongAPIView(APIView):
 
     def get_object(self, pk):
@@ -52,13 +57,13 @@ class SongAPIView(APIView):
 
         if pk:
             data = self.get_object(pk)
-            serializers = SongSerializer(data)
+            serializer = SongSerializer(data)
 
         else:
             data = Song.objects.all()
             serializer = SongSerializer(data, many=True)
 
-            return Response(serializer.data)
+        return Response(serializer.data)
 
     def post(self, request, format=None):
 
@@ -100,8 +105,10 @@ class SongAPIView(APIView):
 class ArtistAPIView(APIView):
 
     def get_object(self, pk):
+
         try:
             return Artist.objects.get(pk=pk)
+
         except Artist.DoesNotExist:
             raise Http404
 
@@ -109,13 +116,13 @@ class ArtistAPIView(APIView):
 
         if pk:
             data = self.get_object(pk)
-            serializers = ArtistSerializer(data)
+            serializer = ArtistSerializer(data)
 
         else:
             data = Artist.objects.all()
             serializer = ArtistSerializer(data, many=True)
 
-            return Response(serializer.data)
+        return Response(serializer.data)
 
     def post(self, request, format=None):
 
@@ -131,6 +138,47 @@ class ArtistAPIView(APIView):
 
         response.data = {
             'message' : 'Artist created successfully',
+            'data': serializer.data,
+        }
+
+        return response
+
+class PlayistAPIView(APIView):
+
+    def get_object(self, pk):
+
+        try:
+            return Playlist.objects.get(pk=pk)
+
+        except Artist.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk=None, format=None):
+
+        if pk:
+            data = self.get_object(pk)
+            serializer = PlaylistSerializer(data)
+
+        else:
+            data = Playlist.objects.all()
+            serializer = PlaylistSerializer(data, many=True)
+
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+
+        data = request.data
+        
+        serializer = PlaylistSerializer(data=data)
+
+        serializer.is_valid(raise_exception=True)
+
+        serializer.save()
+
+        response = Response()
+
+        response.data = {
+            'message' : 'Playlist created successfully',
             'data': serializer.data,
         }
 

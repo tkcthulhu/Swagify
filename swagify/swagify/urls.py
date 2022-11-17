@@ -24,6 +24,7 @@ router.register(r'groups', views.GroupViewSet)
 router.register(r'songs', views.SongViewSet)
 router.register(r'albums', views.AlbumViewSet)
 router.register(r'artists', views.ArtistViewSet)
+router.register(r'playlists', views.PlaylistViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

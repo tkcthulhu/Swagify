@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-from .models import Artist, Genre, Song, Album, Playlist, Tag
+from .models import Artist, Genre, Song, Album, Playlist, Tag, PlaylistOrder
 from pprint import pprint as pp
 
 
@@ -102,15 +102,57 @@ class AlbumSerializer(serializers.ModelSerializer):
 
 
 class TagSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Tag
         fields = ['title']
 
-class PlaylistSerializer(serializers.ModelSerializer):
+class PlaylistTitleSerializer(serializers.ModelSerializer):
 
-    songs = SongSerializer(many=True)
-    tags = TagSerializer(many=True )
+    tags = TagSerializer()
 
     class Meta:
         model = Playlist
-        fields = ['title', 'user_generated', 'songs', 'tags']
+        fields = ['title', 'tags']
+
+class PlaylistSerializer(serializers.ModelSerializer):
+
+    songs = serializers.SerializerMethodField()
+
+    tags = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Playlist
+
+        fields = [
+            'title', 
+            'user_generated', 
+            'songs', 
+            'tags'
+            ]
+
+    def get_songs(self, obj):
+
+        this_playlist = obj.id
+
+        songs = PlaylistOrder.objects.filter(playlist=this_playlist)
+
+        songs = [*songs.order_by('track_num')]
+
+        tracklist = []
+
+        for song in songs:
+            tracklist.append(f'{song.track_num} {song.song}')
+
+        return tracklist
+        
+    def get_tags(self, obj):
+
+        playlist_tags = obj.tags.all()
+
+        tags = []
+
+        for tag in playlist_tags:
+            tags.append(tag.title)
+
+        return tags
