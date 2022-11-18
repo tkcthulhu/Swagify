@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-from .models import Artist, Genre, Song, Album, Playlist, Tag, PlaylistOrder
+from .models import *
 from pprint import pprint as pp
 
 
@@ -67,39 +67,62 @@ class AlbumSerializer(serializers.ModelSerializer):
 
     def get_artist(self, obj):
 
-        return obj.songs.first().main_artist.first().name
+        this_album = obj.id
+
+        songs = AlbumOrder.objects.filter(album=this_album)
+
+        songID = songs.first().id
+
+        artist = Song.objects.get(id=songID).main_artist.first().name
+
+        return artist
 
     def get_songs(self, obj):
 
-        songs = obj.songs.all()
+        this_album = obj.id
 
-        album_song_view = []
+        songs = AlbumOrder.objects.filter(album=this_album)
 
-        track_num = 1
+        songs = [*songs.order_by('track_num')]
 
-        for song in reversed(songs):
+        tracklist = []
 
-            title = song.title
+        for song in songs:
 
-            feat_artists = song.feat_artist.all()
+            songID = song.song.id
+
+            feat_artist = [*Song.objects.get(id=songID).feat_artist.all()]
 
             feats = ''
 
-            if feat_artists:
-
+            if feat_artist:
                 f_a = []
 
-                for x in feat_artists:
+                for x in feat_artist:
                     f_a.append(x.name)
 
                 feats = f' feat. {(" ".join(f_a))}'
 
-            album_song_view.append(f'Track {track_num}: {title}{feats}')
+            sugg_pls =  PlaylistOrder.objects.filter(song=songID).all()
 
-            track_num += 1
+            appears = ''
 
-        return album_song_view
+            a_p = []
 
+            if sugg_pls:
+
+                for sugg in sugg_pls:
+                
+                
+                    playlist = Playlist.objects.get(id=sugg.playlist.id).title
+    
+                    a_p.append(playlist)
+    
+                appears = f' (you might like these playlists! {(", ".join(a_p))})'
+
+            tracklist.append(f'{song.track_num} {song.song.title}{feats}{appears}')
+
+        return tracklist
 
 class TagSerializer(serializers.ModelSerializer):
 

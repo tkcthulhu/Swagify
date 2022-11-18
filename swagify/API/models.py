@@ -36,10 +36,19 @@ class Album(models.Model):
     title = models.CharField(max_length=50)
     date_released = models.DateField()
     compilation = models.BooleanField()
-    songs = models.ManyToManyField('Song')
+    songs = models.ManyToManyField('Song', through='AlbumOrder')
 
     def __str__(self):
         return self.title
+
+class AlbumOrder(models.Model):
+
+    track_num = models.SmallIntegerField()
+    song = models.ForeignKey('Song', on_delete=models.PROTECT)
+    album = models.ForeignKey('Album', on_delete=models.PROTECT)
+
+    def __str__(self):
+        return f'{self.album} track {self.track_num}: {self.song}'
 
 class Tag(models.Model):
 

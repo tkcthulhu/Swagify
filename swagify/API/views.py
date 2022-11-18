@@ -4,6 +4,7 @@ from django.http.response import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from API.serializers import *
+from API.models import *
 from django.contrib.auth.models import User, Group
 
 # Create your views here.
